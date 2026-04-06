@@ -1,85 +1,223 @@
 # HealthGate
-### O **HealthGate** é um sistema projetado para facilitar a integração dos sistemas desenvolvidos no grupo IF4heath: https://if4health.netlify.app/. Ele permite o cadastro e gerenciamento de rotas existentes nos sistemas FASS-ECG, IF-CLOUD e H2Cloud, criando um Gateway eficiente e seguro para rotear requisições. Atualmente o sistema está hospedado no link: https://if4health.charqueadas.ifsul.edu.br/healthgate/login
-![Diagrama HealthGate](./assets/GATEWAY.jpg)
-## Funcionalidades
 
-- **CRUD de rotas**: Gerencie rotas dos sistemas FASS-ECG (https://github.com/if4health/neoFASS-Ecg), IF-CLOUD (https://github.com/if4health/ifcloud/tree/auth-neoFASS) e neoFassEcg (https://github.com/if4health/neoFASS-Ecg).
-- **Autenticação JWT**: Proteção de rotas administrativas com autenticação baseada em tokens.
-- **Redirecionamento dinâmico**: Roteamento de requisições para URLs de destino configuradas.
-- **Logs de requisições**: Registro de requisições e respostas no MongoDB para auditoria.
-- **Suporte a múltiplos métodos HTTP**: GET, POST, PUT, PATCH e DELETE.
+O **HealthGate** é um sistema projetado para facilitar a integração dos sistemas desenvolvidos no grupo IF4Health: https://if4health.netlify.app/.
 
-## Tecnologias Utilizadas
+Ele permite o cadastro e gerenciamento de rotas existentes nos sistemas FASS-ECG, IF-CLOUD e H2Cloud, funcionando como um **Gateway inteligente** para rotear requisições entre serviços.
 
-- **Node.js**: Plataforma para o backend.
-- **Express.js**: Framework para construir a API RESTful.
-- **Axios**: Biblioteca para realizar requisições HTTP.
-- **MongoDB**: Banco de dados utilizado para armazenamento.
-- **EJS**: Template engine para renderização de páginas no frontend.
-- **React**: Utilizado para a interface do frontend.
-- **dotenv**: Gerenciamento de variáveis de ambiente.
+🔗 Acesso ao sistema em produção:
+https://if4health.charqueadas.ifsul.edu.br/healthgate/login
 
-## Pré-requisitos
+---
 
-Antes de executar o projeto, certifique-se de que as seguintes dependências estejam instaladas:
+## 📌 Funcionalidades
 
-- **Node.js** (versão 14.x ou superior)
-- **NPM** ou **Yarn** para gerenciar pacotes
-- **MongoDB** para armazenamento de dados
-- **Acesso ao servidor FHIR** para testar a integração
+- **CRUD de rotas**: Gerencie rotas dos sistemas FASS-ECG, IF-CLOUD e neoFassEcg
+- **Autenticação JWT**: Proteção das rotas administrativas
+- **Redirecionamento dinâmico**: Proxy inteligente para APIs
+- **Logs de requisições**: Armazenamento no MongoDB
+- **Suporte HTTP completo**: GET, POST, PUT, PATCH e DELETE
 
-## Instalação
+---
 
-1. Baixe o MongoDB a partir do [site oficial](https://www.mongodb.com/try/download/community).
-   - Siga o assistente de instalação e certifique-se de marcar a opção "Run MongoDB as a Service".
-   - Após a instalação, abra o terminal e execute o comando `mongod` para iniciar o MongoDB.
+## 🧱 Tecnologias Utilizadas
 
-2. Clone o repositório do projeto:
-   ```bash
-   git clone https://github.com/MariaEduarda004/healthGate.git
-   cd health-gate
-   ```
+- Node.js
+- Express.js
+- Axios
+- MongoDB
+- EJS
+- React (parcial/planejado)
+- dotenv
 
-3. Instale as dependências:
-   - Com npm:
-     ```bash
-     npm install
-     ```
-   - Ou com Yarn:
-     ```bash
-     yarn install
-     ```
+---
 
-4. Configure as variáveis de ambiente no arquivo `.env`. Exemplo:
-   ```bash
-   JWT_SECRET=<seu jwt aqui>
-   FASS_ECG_AUTH_URL=https://if4health.charqueadas.ifsul.edu.br/biosignalinfhir/auth/token
-   FASS_ECG_CLIENT_ID=gateway
-   FASS_ECG_AUTH_CODE= <code gerado pelo H2Cloud>
-   ```
+## ⚙️ Pré-requisitos
 
-5. Inicie o servidor de backend:
-   -  Vá a pasta backend:
-     ```bash
-     cd .\backend\
-     ```
-   - Com npm:
-     ```bash
-     npm start
-     ```
-   - Ou com Yarn:
-     ```bash
-     yarn start
-     ```
-6. Inicie o mongo:
-   -  Vá a pasta db:
-     ```bash
-     cd .\db\
-     ```
-   -  Inicie o mongo:
-     ```bash
-     mongod --dbpath "C:\TCC1\Health-Gate\db\datadb"
-     ```
+- Node.js (>= 14)
+- NPM ou Yarn
+- MongoDB
+- Acesso a um servidor FHIR
 
-O sistema estará disponível em [http://localhost:3001](http://localhost:3001).
+---
 
+## 🚀 Instalação
+
+```bash
+git clone https://github.com/MariaEduarda004/healthGate.git
+cd health-gate
+npm install
+```
+
+### Configurar `.env`
+
+```env
+JWT_SECRET=seu_segredo
+FASS_ECG_AUTH_URL=https://if4health.charqueadas.ifsul.edu.br/biofass/auth/token
+FASS_ECG_CLIENT_ID=gateway
+FASS_ECG_AUTH_CODE=seu_code
+```
+
+### Rodar backend
+
+```bash
+cd backend
+npm start
+```
+
+### Rodar MongoDB
+
+```bash
+mongod --dbpath "./db/datadb"
+```
+
+Acesse:
+👉 http://localhost:3001/healthgate/login
+
+---
+
+# 🔐 Cadastro e Login de Usuário
+
+Antes de usar o sistema, é necessário criar um usuário.
+
+## 📌 Registrar usuário
+
+### Endpoint:
+
+```
+POST /healthgate/api/auth/register
+```
+
+### Exemplo (Postman):
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+---
+
+## 🔑 Login
+
+### Endpoint:
+
+```
+POST /healthgate/api/auth/login
+```
+
+### Exemplo:
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+
+Ou via interface:
+👉 http://localhost:3001/healthgate/login
+
+---
+
+# 🔀 Cadastro de Rotas
+
+Após login, acesse:
+
+👉 `/healthgate/routes/new`
+
+Preencha os campos para criar uma rota dinâmica.
+
+---
+
+## 🧪 Exemplo 1 — SMART Configuration
+
+### Cadastro
+
+| Campo       | Valor                                                         |
+| ----------- | ------------------------------------------------------------- |
+| Projeto     | neoFassEcg                                                    |
+| Source Path | /smart-config                                                 |
+| Method      | GET                                                           |
+| Target URL  | http://localhost:8080/biofass/.well-known/smart-configuration |
+| Headers     | {"accept": "application/json"}                                |
+
+---
+
+## 🔗 Como acessar após cadastrar
+
+A rota NÃO fica disponível diretamente.
+
+Ela segue o padrão:
+
+```
+/healthgate/api/{projeto}/{rota}
+```
+
+### Exemplo:
+
+```
+http://localhost:3001/healthgate/api/h2cloud/smart-config
+```
+
+---
+
+## 📊 Logs
+
+Todas as requisições realizadas via gateway são salvas no MongoDB.
+
+Para acessar manualmente:
+
+```bash
+mongosh
+use healthgate
+show collections
+```
+
+Ver logs:
+
+```js
+db.logs.find().pretty();
+```
+
+---
+
+## ⚠️ Problemas Comuns
+
+### ❌ Cannot GET /
+
+Use:
+
+```
+/healthgate/login
+```
+
+### ❌ Rota não encontrada
+
+Verifique:
+
+```
+/healthgate/api/{projeto}/{rota}
+```
+
+### ❌ Token inválido
+
+Authorization Code expira rapidamente.
+
+---
+
+## 📌 Observações
+
+- O HealthGate atua como **proxy dinâmico de APIs FHIR**
+- O nome do projeto pode ser normalizado (minúsculas)
+- Logs são armazenados mesmo que não apareçam na interface
+
+---
+
+## 🧠 Próximos Passos
+
+- Integração com Patient
+- Integração com Observation
+- Automação de autenticação SMART
+
+---
