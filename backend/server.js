@@ -81,27 +81,43 @@ let fassECGTokenExpiry = null;
 
 async function getAccessTokenForFassECG() {
   const now = Date.now();
+
   if (fassECGToken && fassECGTokenExpiry && now < fassECGTokenExpiry) {
     return fassECGToken;
   }
 
   try {
-    const tokenResponse = await axios.post(process.env.FASS_ECG_AUTH_URL, {
-      client_id: process.env.FASS_ECG_CLIENT_ID,
-      code: process.env.FASS_ECG_AUTH_CODE,
-    });
+    const tokenResponse = await axios.post(
+      process.env.FASS_ECG_AUTH_URL,
+      {
+        grant_type: process.env.FASS_ECG_GRANT_TYPE,
+        client_id: process.env.FASS_ECG_CLIENT_ID,
+        client_secret: process.env.FASS_ECG_CLIENT_SECRET,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+        },
+      },
+    );
 
     const token = tokenResponse.data.access_token;
 
     fassECGToken = token;
-    fassECGTokenExpiry = now + tokenResponse.data.expires_in * 1000 - 5000; // 5 segundos antes do expirar
+    fassECGTokenExpiry = now + tokenResponse.data.expires_in * 1000 - 5000;
+
+    console.log("Novo token FASS_ECG obtido com sucesso");
+
     return fassECGToken;
   } catch (error) {
-    console.error("Erro na obtenção do token:", error);
+    console.error(
+      "Erro na obtenção do token:",
+      error.response?.data || error.message,
+    );
     throw new Error("Falha na autenticação");
   }
 }
-
 async function handleRequest(req, res, projectName) {
   try {
     const routes = await Route.find({
