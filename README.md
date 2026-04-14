@@ -1,11 +1,12 @@
 # HealthGate
 
-O **HealthGate** é um sistema projetado para facilitar a integração dos sistemas desenvolvidos no grupo IF4Health: https://if4health.netlify.app/.
+O **HealthGate** é um sistema projetado para facilitar a integração dos sistemas desenvolvidos no grupo IF4Health.
 
 Ele permite o cadastro e gerenciamento de rotas existentes nos sistemas FASS-ECG, IF-CLOUD e H2Cloud, funcionando como um **Gateway inteligente** para rotear requisições entre serviços.
 
 🔗 Acesso ao sistema em produção:
 https://if4health.charqueadas.ifsul.edu.br/healthgate/login
+![Diagrama HealthGate](./assets/GATEWAY.jpg)
 
 ---
 

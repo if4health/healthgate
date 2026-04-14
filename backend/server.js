@@ -58,27 +58,8 @@ app.get("/healthgate/logout", (req, res) => {
   res.redirect("/healthgate/login");
 });
 
-app.use((req, res, next) => {
-  if (req.method === "PUT") {
-    let data = "";
-    req.on("data", (chunk) => (data += chunk));
-    req.on("end", () => {
-      try {
-        req.body = JSON.parse(data);
-        console.log("Corpo da requisição recebido:", req.body);
-        next();
-      } catch (e) {
-        res.status(400).send("Erro ao parsear o JSON.");
-      }
-    });
-  } else {
-    next();
-  }
-});
-
 let fassECGToken = null;
 let fassECGTokenExpiry = null;
-
 async function getAccessTokenForFassECG() {
   const now = Date.now();
 
@@ -87,16 +68,17 @@ async function getAccessTokenForFassECG() {
   }
 
   try {
+    const params = new URLSearchParams();
+    params.append("grant_type", process.env.FASS_ECG_GRANT_TYPE);
+    params.append("client_id", process.env.FASS_ECG_CLIENT_ID);
+    params.append("client_secret", process.env.FASS_ECG_CLIENT_SECRET);
+
     const tokenResponse = await axios.post(
       process.env.FASS_ECG_AUTH_URL,
-      {
-        grant_type: process.env.FASS_ECG_GRANT_TYPE,
-        client_id: process.env.FASS_ECG_CLIENT_ID,
-        client_secret: process.env.FASS_ECG_CLIENT_SECRET,
-      },
+      params,
       {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
           accept: "application/json",
         },
       },
@@ -104,10 +86,12 @@ async function getAccessTokenForFassECG() {
 
     const token = tokenResponse.data.access_token;
 
+    // salva token e tempo de expiração (com margem de segurança)
     fassECGToken = token;
     fassECGTokenExpiry = now + tokenResponse.data.expires_in * 1000 - 5000;
 
     console.log("Novo token FASS_ECG obtido com sucesso");
+    console.log("TOKEN:", token); // opcional pra debug
 
     return fassECGToken;
   } catch (error) {
@@ -161,33 +145,39 @@ async function handleRequest(req, res, projectName) {
     Object.keys(params).forEach((param) => {
       targetUrl = targetUrl.replace(`:${param}`, params[param]);
     });
-
+    console.log("Target URL final:", targetUrl);
+    console.log("Params extraídos:", params);
     const queryParams = new URLSearchParams(req.query).toString();
     if (queryParams) targetUrl += `?${queryParams}`;
 
+    // Monta os headers base
     let headers = {
       "content-type": "application/json",
       accept: "application/json",
     };
 
+    // Sobrescreve content-type para PUT FHIR
     if (projectName === "FASS_ECG" && matchingRoute.method === "PUT") {
-      headers = {
-        "content-type": "application/fhir+json",
-        accept: "application/fhir+json",
-      };
+      headers["content-type"] = "application/fhir+json";
+      headers["accept"] = "application/fhir+json";
     }
 
+    // Adiciona Authorization
     if (projectName === "FASS_ECG") {
       headers["Authorization"] = `Bearer ${await getAccessTokenForFassECG()}`;
     }
 
     const agent = new https.Agent({ rejectUnauthorized: false });
+    console.log("Headers enviados:", headers);
+    console.log("Body enviado:", typeof req.body, req.body);
 
     const response = await axios({
       method: matchingRoute.method,
       url: targetUrl,
       headers: headers,
-      data: Object.keys(req.body).length ? req.body : undefined,
+      // Passa o body diretamente — Axios serializa automaticamente quando
+      // recebe um objeto e o content-type é application/json ou fhir+json
+      data: req.body,
       httpsAgent: agent,
     });
 
