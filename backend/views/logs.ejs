@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,152 +9,178 @@
   <link href="/healthgate/css/style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 </head>
+
 <body>
 
-<%- include('partials/navbar') %>
+  <%- include('partials/navbar') %>
 
-<div class="container mt-4">
-  <h5 class="mb-4" style="text-align: center;">Logs de Requisições</h5>
-  <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Total Logs</h5>
-          <p class="card-text fs-4" id="totalLogs"><%= statusCounts.success + statusCounts.clientError + statusCounts.serverError %></p>
+    <div class="container mt-4">
+      <h5 class="mb-4" style="text-align: center;">Logs de Requisições</h5>
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Total Logs</h5>
+              <p class="card-text fs-4" id="totalLogs">
+                <%= statusCounts.success + statusCounts.clientError + statusCounts.serverError %>
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-success">Sucessos (2xx)</h5>
-          <p class="card-text fs-4 text-success" id="successCount"><%= statusCounts.success %></p>
-        </div>
-      </div>
-    </div>
-  
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-warning">Erro Cliente (4xx)</h5>
-          <p class="card-text fs-4 text-warning" id="clientErrorCount"><%= statusCounts.clientError %></p>
-        </div>
-      </div>
-    </div>
-  
-    <div class="col-md-3">
-      <div class="card text-center shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title text-danger">Erro Servidor (5xx)</h5>
-          <p class="card-text fs-4 text-danger" id="serverErrorCount"><%= statusCounts.serverError %></p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="row">
-    <div class="col-md-12 mb-4 d-flex justify-content-center align-items-center">
-      <div style="width: 100%; max-width: 300px;">
-        <p  style="text-align: center;">Dash chamadas trafegadas</p>
-        <canvas id="statusChart"></canvas>
-      </div>
-    </div>
-    <div class="col-md-12">
-      <div class="table-responsive">
-        <table id="logsTable" class="table table-bordered table-hover align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>Data/Hora</th>
-          <th>Método</th>
-          <th>Path</th>
-          <th>Status</th>
-          <th>Projeto</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% if (logs.length > 0) { %>
-          <% logs.forEach(log => { %>
-            <tr>
-              <td><%= new Date(log.timestamp).toLocaleString('pt-BR') %></td>
-              <td><span class="badge bg-info text-dark"><%= log.method %></span></td>
-              <td><%= log.path %></td>
-              <td>
-                <% if (log.statusCode >= 200 && log.statusCode < 300) { %>
-                  <span class="badge bg-success"><%= log.statusCode %></span>
-                <% } else if (log.statusCode >= 400 && log.statusCode < 500) { %>
-                  <span class="badge bg-warning text-dark"><%= log.statusCode %></span>
-                <% } else { %>
-                  <span class="badge bg-danger"><%= log.statusCode %></span>
-                <% } %>
-              </td>
-              <td><%= log.projectName %></td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr><td colspan="6" class="text-center">Nenhum log encontrado.</td></tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-  // Iniciar DataTables
-  document.addEventListener("DOMContentLoaded", function () {
-    $('#logsTable').DataTable({
-      language: {
-        url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
-      },
-      pageLength: 10, 
-      lengthChange: false,
-      ordering: true, 
-      searching: true 
-    });
-  });
+        <div class="col-md-3">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title text-success">Sucessos (2xx)</h5>
+              <p class="card-text fs-4 text-success" id="successCount">
+                <%= statusCounts.success %>
+              </p>
+            </div>
+          </div>
+        </div>
 
-  // Gráfico de Rosquinha
-  const ctx = document.getElementById('statusChart').getContext('2d');
-  const statusChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Sucesso (2xx)', 'Erro Cliente (4xx)', 'Erro Servidor (5xx)'],
-      datasets: [{
-        label: 'Status das Requisições',
-        data: [
+        <div class="col-md-3">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title text-warning">Erro Cliente (4xx)</h5>
+              <p class="card-text fs-4 text-warning" id="clientErrorCount">
+                <%= statusCounts.clientError %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title text-danger">Erro Servidor (5xx)</h5>
+              <p class="card-text fs-4 text-danger" id="serverErrorCount">
+                <%= statusCounts.serverError %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-4 d-flex justify-content-center align-items-center">
+          <div style="width: 100%; max-width: 300px;">
+            <p style="text-align: center;">Dash chamadas trafegadas</p>
+            <canvas id="statusChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table id="logsTable" class="table table-bordered table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Método</th>
+                  <th>Path</th>
+                  <th>Status</th>
+                  <th>Projeto</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (logs.length> 0) { %>
+                  <% logs.forEach(log=> { %>
+                    <tr>
+                      <td data-order="<%= new Date(log.timestamp).getTime() %>">
+                        <%= new Date(log.timestamp).toLocaleString('pt-BR') %>
+                      </td>
+                      <td><span class="badge bg-info text-dark">
+                          <%= log.method %>
+                        </span></td>
+                      <td>
+                        <%= log.path %>
+                      </td>
+                      <td>
+                        <% if (log.statusCode>= 200 && log.statusCode < 300) { %>
+                            <span class="badge bg-success">
+                              <%= log.statusCode %>
+                            </span>
+                            <% } else if (log.statusCode>= 400 && log.statusCode < 500) { %>
+                                <span class="badge bg-warning text-dark">
+                                  <%= log.statusCode %>
+                                </span>
+                                <% } else { %>
+                                  <span class="badge bg-danger">
+                                    <%= log.statusCode %>
+                                  </span>
+                                  <% } %>
+                      </td>
+                      <td>
+                        <%= log.projectName %>
+                      </td>
+                    </tr>
+                    <% }) %>
+                      <% } else { %>
+                        <tr>
+                          <td colspan="6" class="text-center">Nenhum log encontrado.</td>
+                        </tr>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+      <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+      <script>
+        // Iniciar DataTables
+        document.addEventListener("DOMContentLoaded", function () {
+          $('#logsTable').DataTable({
+            language: {
+              url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+            },
+            pageLength: 10,
+            lengthChange: false,
+            ordering: true,
+            searching: true
+          });
+        });
+
+        // Gráfico de Rosquinha
+        const ctx = document.getElementById('statusChart').getContext('2d');
+        const statusChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Sucesso (2xx)', 'Erro Cliente (4xx)', 'Erro Servidor (5xx)'],
+            datasets: [{
+              label: 'Status das Requisições',
+              data: [
           <%= statusCounts.success %>,
           <%= statusCounts.clientError %>,
           <%= statusCounts.serverError %>
         ],
-        backgroundColor: [
-          'rgba(40, 167, 69, 0.7)',    // Sucesso - Verde
-          'rgba(255, 193, 7, 0.7)',    // Erro Cliente - Amarelo
-          'rgba(220, 53, 69, 0.7)'     // Erro Servidor - Vermelho
-        ],
-        borderColor: [
-          'rgba(40, 167, 69, 1)',
-          'rgba(255, 193, 7, 1)',
-          'rgba(220, 53, 69, 1)'
-        ],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom'
-        }
-      }
-    }
-  });
-</script>
+              backgroundColor: [
+                'rgba(40, 167, 69, 0.7)',    // Sucesso - Verde
+                'rgba(255, 193, 7, 0.7)',    // Erro Cliente - Amarelo
+                'rgba(220, 53, 69, 0.7)'     // Erro Servidor - Vermelho
+              ],
+              borderColor: [
+                'rgba(40, 167, 69, 1)',
+                'rgba(255, 193, 7, 1)',
+                'rgba(220, 53, 69, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      </script>
 
 </body>
+
 </html>
